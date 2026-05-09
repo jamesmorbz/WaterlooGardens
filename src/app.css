@@ -515,11 +515,19 @@ textarea { resize: vertical; min-height: 80px; }
 }
 
 /* ─── Chat / messenger ─── */
+.chat-page {
+	display: flex;
+	flex-direction: column;
+	height: calc(100vh - var(--nav-height));
+	overflow: hidden;
+	padding-bottom: 0;
+}
+
 .chat-shell {
 	display: flex;
 	flex-direction: column;
-	height: calc(100vh - var(--nav-height) - 120px);
-	min-height: 420px;
+	flex: 1;
+	min-height: 0;
 	background: var(--color-surface);
 	border-radius: var(--radius);
 	border: 1px solid var(--color-border);
@@ -1170,5 +1178,5 @@ textarea { resize: vertical; min-height: 80px; }
 	.topnav { gap: 0; }
 	.brand { flex: 1; }
 	.page { padding: 1.25rem 1rem; }
-	.chat-shell { height: calc(100vh - var(--nav-height) - 80px); }
+	.chat-page { padding-bottom: 0; }
 }

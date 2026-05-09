@@ -48,7 +48,7 @@
 
 <svelte:head><title>{data.channel.name} – Waterloo Gardens</title></svelte:head>
 
-<div class="page">
+<div class="page" class:chat-page={isChat}>
 	{#if isChat}
 		<div class="channel-tabs">
 			<a
