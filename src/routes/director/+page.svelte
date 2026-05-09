@@ -337,7 +337,7 @@
 			<div class="table-scroll">
 				<table class="director-table">
 					<thead>
-						<tr><th>Name</th><th>Flat</th><th>Type</th><th>Role</th><th>Status</th></tr>
+						<tr><th>Name</th><th>Flat</th><th>Type</th><th>Role</th><th>Status</th><th></th></tr>
 					</thead>
 					<tbody>
 						{#each filteredResidents as user (user.id)}
@@ -347,6 +347,18 @@
 								<td><span class="user-type-badge" class:tenant={user.user_type === 'tenant'}>{user.user_type ?? '—'}</span></td>
 								<td>{user.role}</td>
 								<td><span class="status-badge status-{user.status}">{user.status}</span></td>
+								<td>
+									{#if user.id !== data.currentUserId}
+										<form method="POST" action="?/removeUser">
+											<input type="hidden" name="user_id" value={user.id} />
+											<button
+												type="submit"
+												class="btn-danger"
+												onclick={(e) => { if (!confirm(`Remove ${user.full_name} from the site? This cannot be undone.`)) e.preventDefault(); }}
+											>Remove</button>
+										</form>
+									{/if}
+								</td>
 							</tr>
 						{/each}
 					</tbody>

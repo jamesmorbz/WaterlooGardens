@@ -30,6 +30,7 @@ export const load: PageServerLoad = async ({ locals, parent, url }) => {
 	const { profile } = await parent();
 	if (profile?.role !== 'director') error(403, 'Access denied');
 
+	const { user } = await locals.safeGetSession();
 	const tab = url.searchParams.get('tab') ?? 'pending';
 
 	const [{ data: pending }, { data: allUsers }, { data: allDocs }] = await Promise.all([
@@ -38,7 +39,7 @@ export const load: PageServerLoad = async ({ locals, parent, url }) => {
 		locals.supabase.from('documents').select('id, filename, category, tags, created_at, storage_path').order('created_at', { ascending: false })
 	]);
 
-	return { pending: pending ?? [], allUsers: allUsers ?? [], allDocs: allDocs ?? [], tab };
+	return { pending: pending ?? [], allUsers: allUsers ?? [], allDocs: allDocs ?? [], tab, currentUserId: user?.id ?? null };
 };
 
 export const actions: Actions = {
@@ -114,6 +115,16 @@ export const actions: Actions = {
 		}
 
 		redirect(303, '/director?tab=announce&posted=1');
+	},
+
+	removeUser: async ({ request, locals }) => {
+		const data = await request.formData();
+		const user_id = data.get('user_id') as string;
+		if (!user_id) return fail(400, { error: 'Missing user ID' });
+
+		const { error: err } = await locals.supabase.rpc('director_remove_user', { target_id: user_id });
+		if (err) return fail(500, { error: err.message });
+		redirect(303, '/director?tab=residents');
 	},
 
 	deleteDocument: async ({ request, locals }) => {
