@@ -2,8 +2,17 @@ import { error, fail, redirect } from '@sveltejs/kit';
 import { env } from '$env/dynamic/private';
 import type { Actions, PageServerLoad } from './$types';
 
-async function sendEmail(to: string, subject: string, text: string) {
-	if (!env.RESEND_API_KEY || !to) return;
+async function sendEmail(to: string | string[], subject: string, text: string) {
+	if (!env.RESEND_API_KEY) return;
+	const recipients = Array.isArray(to) ? to : [to];
+	if (recipients.length === 0) return;
+
+	// Single recipient: send directly. Multiple: use BCC so residents can't see each other.
+	const payload =
+		recipients.length === 1
+			? { to: recipients[0], subject, text }
+			: { to: 'noreply@waterloogardens.co.uk', bcc: recipients, subject, text };
+
 	await fetch('https://api.resend.com/emails', {
 		method: 'POST',
 		headers: {
@@ -12,9 +21,7 @@ async function sendEmail(to: string, subject: string, text: string) {
 		},
 		body: JSON.stringify({
 			from: 'Waterloo Gardens <noreply@waterloogardens.co.uk>',
-			to,
-			subject,
-			text
+			...payload
 		})
 	});
 }
@@ -78,6 +85,7 @@ export const actions: Actions = {
 		const title = (data.get('title') as string)?.trim() || null;
 		const body = (data.get('body') as string)?.trim();
 		const pinned = data.get('pinned') === 'on';
+		const sendEmailToResidents = data.get('send_email') === 'on';
 
 		if (!body) return fail(400, { error: 'Announcement text is required' });
 
@@ -94,6 +102,17 @@ export const actions: Actions = {
 			.insert({ channel_id: channel.id, author_id: user.id, title, body, is_pinned: pinned });
 
 		if (err) return fail(500, { error: err.message });
+
+		if (sendEmailToResidents) {
+			const { data: emails } = await locals.supabase.rpc('get_approved_resident_emails');
+			if (emails && emails.length > 0) {
+				const origin = new URL(request.url).origin;
+				const subject = title ?? 'New Announcement – Waterloo Gardens';
+				const text = `${body}\n\n---\nView on the Waterloo Gardens portal: ${origin}/channels/announcements`;
+				await sendEmail(emails, subject, text);
+			}
+		}
+
 		redirect(303, '/director?tab=announce&posted=1');
 	},
 
@@ -117,51 +136,4 @@ export const actions: Actions = {
 		redirect(303, '/director?tab=docs');
 	},
 
-	uploadDocument: async ({ request, locals }) => {
-		const { user } = await locals.safeGetSession();
-		if (!user) return fail(401, { error: 'Not authenticated' });
-
-		const data = await request.formData();
-		const file = data.get('file') as File;
-		const filename = (data.get('filename') as string)?.trim();
-		const description = (data.get('description') as string)?.trim() || null;
-		const category = (data.get('category') as string)?.trim();
-		const tagsRaw = (data.get('tags') as string)?.trim();
-		const tags = tagsRaw ? tagsRaw.split(',').map((t) => t.trim()).filter(Boolean) : [];
-
-		if (!file || file.size === 0) return fail(400, { error: 'No file selected' });
-		if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
-			return fail(400, { error: 'Only PDF files are accepted' });
-		}
-		if (!filename) return fail(400, { error: 'Filename is required' });
-		if (!category) return fail(400, { error: 'Category is required' });
-		if (file.size > 20 * 1024 * 1024) return fail(400, { error: 'File must be under 20 MB' });
-
-		const safeName = file.name.replace(/[^a-z0-9._-]/gi, '_');
-		const storagePath = `${user.id}/${Date.now()}-${safeName}`;
-
-		const bytes = await file.arrayBuffer();
-		const { error: uploadErr } = await locals.supabase.storage
-			.from('documents')
-			.upload(storagePath, bytes, { contentType: 'application/pdf' });
-
-		if (uploadErr) return fail(500, { error: `Upload failed: ${uploadErr.message}` });
-
-		const { error: insertErr } = await locals.supabase.from('documents').insert({
-			filename,
-			description,
-			category,
-			storage_path: storagePath,
-			mime_type: 'application/pdf',
-			uploaded_by: user.id,
-			tags
-		});
-
-		if (insertErr) {
-			await locals.supabase.storage.from('documents').remove([storagePath]);
-			return fail(500, { error: insertErr.message });
-		}
-
-		redirect(303, '/director?tab=upload&uploaded=1');
-	}
 };

@@ -29,6 +29,7 @@
 		<p>
 			For general questions, you can post in the <a href="/channels/general">Residents' Forum</a>.
 			<strong>For urgent matters, please contact <a href="#current-directors" class="highlight-link">the directors</a> directly using the details below.</strong>
+		</p>
 		<h2>I'm having trouble with my account</h2>
 		<p>
 			Use the "Forgot password?" link on the <a href="/login">sign-in page</a> to reset your

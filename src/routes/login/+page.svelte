@@ -1,8 +1,12 @@
 <script lang="ts">
+	import { page } from '$app/state';
 	import type { ActionData } from './$types';
 
 	let { form }: { form: ActionData } = $props();
 	let showForgot = $state(false);
+
+	const urlError = page.url.searchParams.get('error');
+	const deleted = page.url.searchParams.get('deleted');
 </script>
 
 <svelte:head><title>Sign in – Waterloo Gardens</title></svelte:head>
@@ -13,6 +17,12 @@
 
 	{#if form?.error}
 		<p class="error-msg">{form.error}</p>
+	{/if}
+	{#if urlError === 'invalid_link'}
+		<p class="error-msg">That confirmation link is invalid or has expired. Please register again or contact a director.</p>
+	{/if}
+	{#if deleted}
+		<p class="info-msg">Your account has been deleted. Sorry to see you go.</p>
 	{/if}
 	{#if form?.message}
 		<p class="info-msg">{form.message}</p>

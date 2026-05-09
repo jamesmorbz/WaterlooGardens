@@ -2,6 +2,7 @@
 	import type { ActionData } from './$types';
 
 	let { form }: { form: ActionData } = $props();
+	let userTypeChoice = $state('');
 </script>
 
 <svelte:head><title>Register – Waterloo Gardens</title></svelte:head>
@@ -35,16 +36,33 @@
 			<p style="font-size:0.875rem;font-weight:500;margin:0 0 0.375rem">I am a</p>
 			<div class="radio-group">
 				<label class="radio-label">
-					<input type="radio" name="user_type" value="leaseholder" required />
+					<input type="radio" name="user_type" value="leaseholder" required
+						onchange={() => (userTypeChoice = 'leaseholder')} />
 					Leaseholder
 					<small>I own the lease on my flat</small>
 				</label>
 				<label class="radio-label">
-					<input type="radio" name="user_type" value="tenant" />
+					<input type="radio" name="user_type" value="tenant"
+						onchange={() => (userTypeChoice = 'tenant')} />
 					Tenant
 					<small>I rent from my landlord</small>
 				</label>
+				<label class="radio-label">
+					<input type="radio" name="user_type" value="other"
+						onchange={() => (userTypeChoice = 'other')} />
+					Other
+					<small>Realtor, estate agent, etc.</small>
+				</label>
 			</div>
+			{#if userTypeChoice === 'other'}
+				<input
+					type="text"
+					name="user_type_custom"
+					placeholder="Please specify…"
+					required
+					style="margin-top:0.5rem;width:100%"
+				/>
+			{/if}
 		</div>
 		<div class="form-group">
 			<label for="email">Email</label>
@@ -58,6 +76,9 @@
 			<input id="password" type="password" name="password" required minlength="8" autocomplete="new-password" />
 		</div>
 		<button type="submit" class="btn-primary" style="width:100%">Register</button>
+		<p class="register-disclaimer">
+			By registering you may receive email notifications when announcements are posted to the portal.
+		</p>
 	</form>
 
 	<div class="auth-links">

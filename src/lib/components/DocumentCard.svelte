@@ -3,7 +3,6 @@
 
 	let { doc }: { doc: Document & { signed_url: string | null } } = $props();
 
-	let showPreview = $state(false);
 	const isPdf = $derived(doc.mime_type === 'application/pdf');
 
 	function formatDate(s: string) {
@@ -37,19 +36,15 @@
 
 	<div class="doc-actions">
 		{#if isPdf && doc.signed_url}
-			<button
+			<a
+				href={doc.signed_url}
+				target="_blank"
+				rel="noopener noreferrer"
 				class="btn-secondary preview-btn"
-				onclick={() => (showPreview = !showPreview)}
-			>
-				{showPreview ? 'Close' : 'Preview'}
-			</button>
+			>Preview</a>
 		{/if}
 		{#if doc.signed_url}
 			<a href="/api/download/{doc.id}" class="btn-primary">Download</a>
 		{/if}
 	</div>
-
-	{#if showPreview && doc.signed_url}
-		<iframe src={doc.signed_url} title={doc.filename} class="pdf-preview"></iframe>
-	{/if}
 </div>

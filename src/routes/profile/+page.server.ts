@@ -1,4 +1,4 @@
-import { fail } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ parent }) => {
@@ -44,5 +44,21 @@ export const actions: Actions = {
 		const { error } = await locals.supabase.auth.updateUser({ password });
 		if (error) return fail(400, { passwordError: error.message });
 		return { passwordSuccess: true };
+	},
+
+	deleteAccount: async ({ request, locals }) => {
+		const { user } = await locals.safeGetSession();
+		if (!user) return fail(401, { deleteError: 'Not authenticated' });
+
+		const data = await request.formData();
+		if (data.get('confirm') !== 'DELETE') {
+			return fail(400, { deleteError: 'Type DELETE in capitals to confirm.' });
+		}
+
+		const { error } = await locals.supabase.rpc('delete_own_account');
+		if (error) return fail(500, { deleteError: error.message });
+
+		await locals.supabase.auth.signOut();
+		redirect(303, '/login?deleted=1');
 	}
 };

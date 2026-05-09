@@ -1,42 +1,81 @@
-# sv
+# Waterloo Gardens Resident Portal
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+A private web portal for residents of Waterloo Gardens, N1 1TY, London. Built and maintained by residents.
 
-## Creating a project
+**Features**: announcements, residents' forum, and a searchable document library (service charge accounts, meeting minutes, insurance, and more).
 
-If you're seeing this, you've probably already done this step. Congrats!
+---
 
-```sh
-# create a new project
-npx sv create my-app
-```
+## Stack
 
-To recreate this project with the same configuration:
+- **SvelteKit** (Svelte 5 runes) — frontend and server-side rendering
+- **Supabase** — PostgreSQL database, authentication, and file storage
+- **Vercel** — hosting (eu-west-2 / London region for GDPR)
+- **Resend** — transactional email for account approval notifications
+- Plain CSS — no UI framework
 
-```sh
-# recreate this project
-npx sv@0.15.3 create --template minimal --types ts --add sveltekit-adapter="adapter:vercel" --no-download-check --install npm .
-```
+---
 
-## Developing
+## Getting Started
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+### Prerequisites
 
-```sh
+- Node.js 18+
+- A Supabase project (eu-west-2 region)
+- A Vercel account (for deployment)
+- A Resend account (for email notifications)
+
+### Local Development
+
+```bash
+npm install
 npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
 ```
 
-## Building
+### Environment Variables
 
-To create a production version of your app:
+Create a `.env` file (see `.env.example`):
 
-```sh
-npm run build
+```
+PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+RESEND_API_KEY=re_your_key
+SUPABASE_ACCESS_TOKEN=your-token   # only needed for CLI commands
 ```
 
-You can preview the production build with `npm run preview`.
+### Database Setup
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+Migrations are in `/supabase/migrations/`. Apply them with:
+
+```bash
+npx supabase db push
+```
+
+### Type Checking
+
+```bash
+npm run check   # must pass with 0 errors, 0 warnings before deploying
+```
+
+---
+
+## Deployment
+
+Deployed automatically to Vercel on push to `main`. The SvelteKit Vercel adapter is pre-configured.
+
+---
+
+## Access
+
+The portal is private to residents of the building. New accounts are reviewed and approved by a director before access is granted.
+
+- **Public**: home, announcements, forum, about, FAQ
+- **Approved residents**: document library, profile, posting in the forum
+- **Directors**: director panel (post announcements, upload/delete documents, manage residents)
+
+---
+
+## Documentation
+
+- `CLAUDE.md` — developer and AI assistant guide (architecture, patterns, constraints)
+- `REQUIREMENTS.md` — product requirements reflecting what is actually built

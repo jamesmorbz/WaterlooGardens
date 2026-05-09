@@ -6,9 +6,18 @@
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 
 	let tab = $state(untrack(() => data.tab));
-	let selectedFile = $state('');
 	let residentSearch = $state('');
 	let docSearch = $state('');
+
+	// Upload tab state
+	let selectedFile = $state('');
+	let uploadFileObj = $state<File | null>(null);
+	let uploadFilename = $state('');
+	let uploadDesc = $state('');
+	let uploadCategory = $state('');
+	let uploadTags = $state('');
+	let uploadStatus = $state<'idle' | 'uploading' | 'saving' | 'done' | 'error'>('idle');
+	let uploadError = $state('');
 
 	let filteredResidents = $derived.by(() => {
 		if (!residentSearch.trim()) return data.allUsers;
@@ -37,7 +46,77 @@
 
 	function onFileChange(e: Event) {
 		const input = e.currentTarget as HTMLInputElement;
-		selectedFile = input.files?.[0]?.name ?? '';
+		const file = input.files?.[0] ?? null;
+		uploadFileObj = file;
+		selectedFile = file?.name ?? '';
+		uploadFilename = file?.name.replace(/\.pdf$/i, '') ?? '';
+		uploadStatus = 'idle';
+		uploadError = '';
+	}
+
+	async function handleUploadSubmit(e: SubmitEvent) {
+		e.preventDefault();
+
+		if (!uploadFileObj) { uploadError = 'Please select a file.'; return; }
+		if (uploadFileObj.size > 20 * 1024 * 1024) { uploadError = 'File must be under 20 MB.'; return; }
+		if (!uploadFilename.trim()) { uploadError = 'Display name is required.'; return; }
+		if (!uploadCategory.trim()) { uploadError = 'Category is required.'; return; }
+
+		uploadStatus = 'uploading';
+		uploadError = '';
+
+		try {
+			// Step 1: get a signed upload URL from our server
+			const urlRes = await fetch('/api/upload-url', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ filename: uploadFileObj.name })
+			});
+			if (!urlRes.ok) {
+				const body = await urlRes.json().catch(() => ({}));
+				throw new Error(body.message ?? 'Failed to prepare upload.');
+			}
+			const { signedUrl, storagePath } = await urlRes.json();
+
+			// Step 2: upload directly to Supabase Storage — bypasses Vercel entirely
+			const putRes = await fetch(signedUrl, {
+				method: 'PUT',
+				body: uploadFileObj,
+				headers: { 'Content-Type': 'application/pdf' }
+			});
+			if (!putRes.ok) throw new Error('File upload failed. Please try again.');
+
+			// Step 3: save metadata row
+			uploadStatus = 'saving';
+			const tags = uploadTags.split(',').map((t) => t.trim()).filter(Boolean);
+			const saveRes = await fetch('/api/save-document', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					filename: uploadFilename.trim(),
+					description: uploadDesc.trim() || null,
+					category: uploadCategory.trim(),
+					tags,
+					storagePath
+				})
+			});
+			if (!saveRes.ok) {
+				const body = await saveRes.json().catch(() => ({}));
+				throw new Error(body.message ?? 'Failed to save document record.');
+			}
+
+			// Reset form
+			uploadFileObj = null;
+			selectedFile = '';
+			uploadFilename = '';
+			uploadDesc = '';
+			uploadCategory = '';
+			uploadTags = '';
+			uploadStatus = 'done';
+		} catch (err) {
+			uploadStatus = 'error';
+			uploadError = err instanceof Error ? err.message : 'Upload failed.';
+		}
 	}
 </script>
 
@@ -124,29 +203,28 @@
 					Pin this announcement (shows at the top)
 				</label>
 			</div>
+			<div class="form-group">
+				<label class="checkbox-label">
+					<input type="checkbox" name="send_email" />
+					Email this announcement to all approved residents
+				</label>
+			</div>
 			<button type="submit" class="btn-primary">Post Announcement</button>
 		</form>
 
 	{:else if tab === 'upload'}
-		{#if page.url.searchParams.get('uploaded')}
+		{#if uploadStatus === 'done'}
 			<p class="info-msg" style="background:#d1fae5;color:#065f46">Document uploaded successfully.</p>
 		{/if}
-		{#if form?.error}<p class="error-msg">{form.error}</p>{/if}
-		<form
-			method="POST"
-			action="?/uploadDocument"
-			enctype="multipart/form-data"
-			style="max-width:560px"
-		>
+		{#if uploadStatus === 'error'}
+			<p class="error-msg">{uploadError}</p>
+		{/if}
+		<form onsubmit={handleUploadSubmit} style="max-width:560px">
 			<div class="form-group">
 				<p style="font-size:0.875rem;font-weight:500;margin:0 0 0.375rem">PDF file</p>
 				<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 				<!-- svelte-ignore a11y_click_events_have_key_events -->
-				<label
-					class="upload-zone"
-					class:has-file={selectedFile}
-					for="file-input"
-				>
+				<label class="upload-zone" class:has-file={selectedFile} for="file-input">
 					<div class="upload-icon">📄</div>
 					{#if selectedFile}
 						<p class="file-name">{selectedFile}</p>
@@ -158,9 +236,7 @@
 					<input
 						id="file-input"
 						type="file"
-						name="file"
 						accept=".pdf,application/pdf"
-						required
 						onchange={onFileChange}
 					/>
 				</label>
@@ -170,25 +246,24 @@
 				<input
 					id="doc-filename"
 					type="text"
-					name="filename"
 					required
 					placeholder="e.g. Service Charge Accounts 2025"
-					value={selectedFile.replace(/\.pdf$/i, '')}
+					bind:value={uploadFilename}
 				/>
 			</div>
 			<div class="form-group">
 				<label for="doc-desc">Description <span style="font-weight:400;color:var(--color-muted)">(optional)</span></label>
-				<textarea id="doc-desc" name="description" rows="2" placeholder="Brief description of the document"></textarea>
+				<textarea id="doc-desc" rows="2" placeholder="Brief description of the document" bind:value={uploadDesc}></textarea>
 			</div>
 			<div class="form-group">
 				<label for="doc-cat">Category</label>
 				<input
 					id="doc-cat"
 					type="text"
-					name="category"
 					required
 					placeholder="e.g. Finance"
 					list="cat-suggestions"
+					bind:value={uploadCategory}
 				/>
 				<datalist id="cat-suggestions">
 					<option value="Finance"></option>
@@ -205,11 +280,13 @@
 				<input
 					id="doc-tags"
 					type="text"
-					name="tags"
 					placeholder="e.g. 2025, service charge, accounts"
+					bind:value={uploadTags}
 				/>
 			</div>
-			<button type="submit" class="btn-primary">Upload Document</button>
+			<button type="submit" class="btn-primary" disabled={uploadStatus === 'uploading' || uploadStatus === 'saving'}>
+				{#if uploadStatus === 'uploading'}Uploading…{:else if uploadStatus === 'saving'}Saving…{:else}Upload Document{/if}
+			</button>
 		</form>
 
 	{:else if tab === 'docs'}

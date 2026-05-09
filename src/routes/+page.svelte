@@ -20,7 +20,9 @@
 	<p>The resident portal for Waterloo Gardens, N1 1TY — announcements, shared documents and the residents' forum, all in one place.</p>
 	<div class="hero-links">
 		<a href="/channels/announcements" class="btn-hero">View Announcements</a>
-		<a href="/register" class="btn-hero-outline">Register</a>
+		{#if !data.session}
+			<a href="/register" class="btn-hero-outline">Register</a>
+		{/if}
 	</div>
 </div>
 

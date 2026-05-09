@@ -94,6 +94,13 @@
 	</nav>
 {/if}
 
+{#if data.profile?.status === 'pending' && !['/pending', '/about', '/faq'].includes(page.url.pathname)}
+	<div class="pending-banner">
+		Your account is awaiting approval by a director — some areas of the site are restricted until then.
+		<a href="/pending">Learn more</a>
+	</div>
+{/if}
+
 <main>
 	{@render children()}
 </main>
