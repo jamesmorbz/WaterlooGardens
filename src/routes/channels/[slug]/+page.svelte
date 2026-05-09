@@ -63,6 +63,14 @@
 			>Maintenance</a>
 		</div>
 
+		<div class="chat-banner">
+			{#if data.channel.slug === 'maintenance'}
+				Use this channel to flag maintenance issues, report problems in communal areas, or coordinate with neighbours on building matters.
+			{:else}
+				A place to chat with your neighbours — share updates, ask questions, or just say hello.
+			{/if}
+		</div>
+
 		<div class="chat-shell">
 			<div class="chat-scroll" id="chat-scroll">
 				{#if data.posts.length === 0}

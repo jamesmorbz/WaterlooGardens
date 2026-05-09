@@ -504,6 +504,16 @@ textarea { resize: vertical; min-height: 80px; }
 .channel-tab:hover { color: var(--color-primary); text-decoration: none; }
 .channel-tab.active { color: var(--color-primary); border-bottom-color: var(--color-primary); font-weight: 600; }
 
+.chat-banner {
+	font-size: 0.825rem;
+	color: var(--color-muted);
+	background: var(--color-surface);
+	border: 1px solid var(--color-border);
+	border-radius: var(--radius);
+	padding: 0.625rem 1rem;
+	margin-bottom: 0.75rem;
+}
+
 /* ─── Chat / messenger ─── */
 .chat-shell {
 	display: flex;
