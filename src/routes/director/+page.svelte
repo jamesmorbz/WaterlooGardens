@@ -299,30 +299,32 @@
 		{:else if filteredDocs.length === 0}
 			<p class="empty">No documents match "{docSearch}".</p>
 		{:else}
-			<table class="director-table">
-				<thead>
-					<tr><th>Name</th><th>Category</th><th>Uploaded</th><th></th></tr>
-				</thead>
-				<tbody>
-					{#each filteredDocs as doc (doc.id)}
-						<tr>
-							<td>{doc.filename}</td>
-							<td><span class="category-badge">{doc.category}</span></td>
-							<td>{new Date(doc.created_at).toLocaleDateString('en-GB')}</td>
-							<td>
-								<form method="POST" action="?/deleteDocument">
-									<input type="hidden" name="doc_id" value={doc.id} />
-									<button
-										type="submit"
-										class="btn-danger"
-										onclick={(e) => { if (!confirm(`Delete "${doc.filename}"?`)) e.preventDefault(); }}
-									>Delete</button>
-								</form>
-							</td>
-						</tr>
-					{/each}
-				</tbody>
-			</table>
+			<div class="table-scroll">
+				<table class="director-table">
+					<thead>
+						<tr><th>Name</th><th>Category</th><th>Uploaded</th><th></th></tr>
+					</thead>
+					<tbody>
+						{#each filteredDocs as doc (doc.id)}
+							<tr>
+								<td>{doc.filename}</td>
+								<td><span class="category-badge">{doc.category}</span></td>
+								<td>{new Date(doc.created_at).toLocaleDateString('en-GB')}</td>
+								<td>
+									<form method="POST" action="?/deleteDocument">
+										<input type="hidden" name="doc_id" value={doc.id} />
+										<button
+											type="submit"
+											class="btn-danger"
+											onclick={(e) => { if (!confirm(`Delete "${doc.filename}"?`)) e.preventDefault(); }}
+										>Delete</button>
+									</form>
+								</td>
+							</tr>
+						{/each}
+					</tbody>
+				</table>
+			</div>
 		{/if}
 
 	{:else if tab === 'residents'}
@@ -332,22 +334,24 @@
 		{#if filteredResidents.length === 0}
 			<p class="empty">No residents match "{residentSearch}".</p>
 		{:else}
-			<table class="director-table">
-				<thead>
-					<tr><th>Name</th><th>Flat</th><th>Type</th><th>Role</th><th>Status</th></tr>
-				</thead>
-				<tbody>
-					{#each filteredResidents as user (user.id)}
-						<tr>
-							<td>{user.full_name}</td>
-							<td>{user.flat_number}</td>
-							<td><span class="user-type-badge" class:tenant={user.user_type === 'tenant'}>{user.user_type ?? '—'}</span></td>
-							<td>{user.role}</td>
-							<td><span class="status-badge status-{user.status}">{user.status}</span></td>
-						</tr>
-					{/each}
-				</tbody>
-			</table>
+			<div class="table-scroll">
+				<table class="director-table">
+					<thead>
+						<tr><th>Name</th><th>Flat</th><th>Type</th><th>Role</th><th>Status</th></tr>
+					</thead>
+					<tbody>
+						{#each filteredResidents as user (user.id)}
+							<tr>
+								<td>{user.full_name}</td>
+								<td>{user.flat_number}</td>
+								<td><span class="user-type-badge" class:tenant={user.user_type === 'tenant'}>{user.user_type ?? '—'}</span></td>
+								<td>{user.role}</td>
+								<td><span class="status-badge status-{user.status}">{user.status}</span></td>
+							</tr>
+						{/each}
+					</tbody>
+				</table>
+			</div>
 		{/if}
 	{/if}
 </div>

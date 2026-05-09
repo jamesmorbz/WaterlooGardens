@@ -958,10 +958,16 @@ textarea { resize: vertical; min-height: 80px; }
 
 /* ─── Director ─── */
 .director-section { margin-bottom: 2rem; }
+.table-scroll {
+	overflow-x: auto;
+	-webkit-overflow-scrolling: touch;
+}
+
 .director-table {
 	width: 100%;
 	border-collapse: collapse;
 	font-size: 0.875rem;
+	min-width: 480px;
 }
 .director-table th,
 .director-table td {
