@@ -520,7 +520,7 @@ textarea { resize: vertical; min-height: 80px; }
 	flex-direction: column;
 	height: calc(100vh - var(--nav-height));
 	overflow: hidden;
-	padding-bottom: 0;
+	padding-bottom: 1.25rem;
 }
 
 .chat-shell {
