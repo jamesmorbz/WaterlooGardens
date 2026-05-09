@@ -1,7 +1,7 @@
 import { redirect } from '@sveltejs/kit';
 import type { LayoutServerLoad } from './$types';
 
-const PROTECTED_PATHS = ['/documents', '/director', '/profile'];
+const PROTECTED_PATHS = ['/director', '/profile'];
 
 export const load: LayoutServerLoad = async ({ locals, url }) => {
 	const { session, user } = await locals.safeGetSession();

@@ -9,7 +9,7 @@
 	let sortBy = $state<'date' | 'name'>('date');
 	let sortOpen = $state(false);
 	let activeTags = $state(new Set<string>());
-	let dropdownEl: HTMLElement | undefined;
+	let dropdownEl = $state<HTMLElement | undefined>(undefined);
 
 	const sortLabels: Record<string, string> = { date: 'Most recent', name: 'Name A–Z' };
 
@@ -63,64 +63,78 @@
 <div class="page">
 	<div class="page-header">
 		<h1>Documents</h1>
-		<div class="controls">
-			<div class="search-field">
-				<input type="search" placeholder="Search by name, category or tag…" bind:value={search} />
+		{#if data.session && data.profile?.status === 'approved'}
+			<div class="controls">
+				<div class="search-field">
+					<input type="search" placeholder="Search by name, category or tag…" bind:value={search} />
+				</div>
+				<!-- svelte-ignore a11y_no_static_element_interactions -->
+				<div class="dropdown" class:open={sortOpen} bind:this={dropdownEl}>
+					<button class="dropdown-trigger" type="button" onclick={() => (sortOpen = !sortOpen)}>
+						{sortLabels[sortBy]}
+						<span class="arrow">▼</span>
+					</button>
+					{#if sortOpen}
+						<div class="dropdown-menu">
+							{#each Object.entries(sortLabels) as [val, label]}
+								<button
+									class="dropdown-item"
+									class:selected={sortBy === val}
+									type="button"
+									onclick={() => { sortBy = val as 'date' | 'name'; sortOpen = false; }}
+								>
+									<span class="check">✓</span>{label}
+								</button>
+							{/each}
+						</div>
+					{/if}
+				</div>
 			</div>
-			<!-- svelte-ignore a11y_no_static_element_interactions -->
-			<div class="dropdown" class:open={sortOpen} bind:this={dropdownEl}>
-				<button class="dropdown-trigger" type="button" onclick={() => (sortOpen = !sortOpen)}>
-					{sortLabels[sortBy]}
-					<span class="arrow">▼</span>
-				</button>
-				{#if sortOpen}
-					<div class="dropdown-menu">
-						{#each Object.entries(sortLabels) as [val, label]}
-							<button
-								class="dropdown-item"
-								class:selected={sortBy === val}
-								type="button"
-								onclick={() => { sortBy = val as 'date' | 'name'; sortOpen = false; }}
-							>
-								<span class="check">✓</span>{label}
-							</button>
-						{/each}
-					</div>
+		{/if}
+	</div>
+
+	{#if data.session && data.profile?.status === 'approved'}
+		<div class="category-tabs">
+			<button class:active={activeCategory === 'All'} onclick={() => (activeCategory = 'All')}>All</button>
+			{#each data.categories as cat}
+				<button class:active={activeCategory === cat} onclick={() => (activeCategory = cat)}>{cat}</button>
+			{/each}
+		</div>
+
+		{#if allTags.length > 0}
+			<div class="filter-bar">
+				<span class="filter-bar-label">Tags:</span>
+				{#each allTags as tag}
+					<button
+						class="tag-filter-pill"
+						class:active={activeTags.has(tag)}
+						type="button"
+						onclick={() => toggleTag(tag)}
+					>{tag}</button>
+				{/each}
+				{#if activeTags.size > 0}
+					<button
+						class="tag-filter-pill"
+						style="opacity:0.65"
+						type="button"
+						onclick={() => (activeTags = new Set())}
+					>✕ Clear</button>
 				{/if}
 			</div>
-		</div>
-	</div>
-
-	<div class="category-tabs">
-		<button class:active={activeCategory === 'All'} onclick={() => (activeCategory = 'All')}>All</button>
-		{#each data.categories as cat}
-			<button class:active={activeCategory === cat} onclick={() => (activeCategory = cat)}>{cat}</button>
-		{/each}
-	</div>
-
-	{#if allTags.length > 0}
-		<div class="filter-bar">
-			<span class="filter-bar-label">Tags:</span>
-			{#each allTags as tag}
-				<button
-					class="tag-filter-pill"
-					class:active={activeTags.has(tag)}
-					type="button"
-					onclick={() => toggleTag(tag)}
-				>{tag}</button>
-			{/each}
-			{#if activeTags.size > 0}
-				<button
-					class="tag-filter-pill"
-					style="opacity:0.65"
-					type="button"
-					onclick={() => (activeTags = new Set())}
-				>✕ Clear</button>
-			{/if}
-		</div>
+		{/if}
 	{/if}
 
-	{#if filtered.length === 0}
+	{#if !data.session}
+		<div class="doc-login-prompt">
+			<p>
+				<a href="/login">Sign in</a> or <a href="/register">register</a> to access the document library.
+			</p>
+		</div>
+	{:else if data.profile?.status === 'pending'}
+		<div class="doc-login-prompt">
+			<p>Your account is awaiting approval before you can access documents.</p>
+		</div>
+	{:else if filtered.length === 0}
 		<p class="empty">No documents found.</p>
 	{:else}
 		<div class="doc-grid">
