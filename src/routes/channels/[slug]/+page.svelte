@@ -1,6 +1,8 @@
 <script lang="ts">
 	import PostItem from '$lib/components/PostItem.svelte';
 	import ChatMessage from '$lib/components/ChatMessage.svelte';
+	import { invalidateAll } from '$app/navigation';
+	import { tick } from 'svelte';
 	import type { PageData, ActionData } from './$types';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -21,9 +23,26 @@
 		return gap < 300_000;
 	}
 
+	// Scroll to bottom on initial load
 	$effect(() => {
 		const el = document.getElementById('chat-scroll');
 		if (el) el.scrollTop = el.scrollHeight;
+	});
+
+	// Poll for new messages every 10 seconds
+	$effect(() => {
+		if (!isChat) return;
+		const interval = setInterval(async () => {
+			const el = document.getElementById('chat-scroll');
+			const nearBottom = !el || el.scrollHeight - el.scrollTop - el.clientHeight < 150;
+			await invalidateAll();
+			if (nearBottom) {
+				await tick();
+				const el2 = document.getElementById('chat-scroll');
+				if (el2) el2.scrollTop = el2.scrollHeight;
+			}
+		}, 10_000);
+		return () => clearInterval(interval);
 	});
 </script>
 

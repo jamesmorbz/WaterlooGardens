@@ -66,7 +66,7 @@ export const actions: Actions = {
 		redirect(303, `/channels/${params.slug}`);
 	},
 
-	createComment: async ({ request, locals }) => {
+	createComment: async ({ request, locals, params }) => {
 		const { user } = await locals.safeGetSession();
 		if (!user) return fail(401, { error: 'Not authenticated' });
 
@@ -81,10 +81,10 @@ export const actions: Actions = {
 			.insert({ post_id, author_id: user.id, body });
 
 		if (err) return fail(500, { error: err.message });
-		return { success: true };
+		redirect(303, `/channels/${params.slug}`);
 	},
 
-	deletePost: async ({ request, locals }) => {
+	deletePost: async ({ request, locals, params }) => {
 		const { user } = await locals.safeGetSession();
 		if (!user) return fail(401, { error: 'Not authenticated' });
 
@@ -93,10 +93,10 @@ export const actions: Actions = {
 
 		const { error: err } = await locals.supabase.from('posts').delete().eq('id', post_id);
 		if (err) return fail(500, { error: err.message });
-		return { success: true };
+		redirect(303, `/channels/${params.slug}`);
 	},
 
-	pinPost: async ({ request, locals }) => {
+	pinPost: async ({ request, locals, params }) => {
 		const { user } = await locals.safeGetSession();
 		if (!user) return fail(401, { error: 'Not authenticated' });
 
@@ -110,10 +110,10 @@ export const actions: Actions = {
 			.eq('id', post_id);
 
 		if (err) return fail(500, { error: err.message });
-		return { success: true };
+		redirect(303, `/channels/${params.slug}`);
 	},
 
-	deleteComment: async ({ request, locals }) => {
+	deleteComment: async ({ request, locals, params }) => {
 		const { user } = await locals.safeGetSession();
 		if (!user) return fail(401, { error: 'Not authenticated' });
 
@@ -122,6 +122,6 @@ export const actions: Actions = {
 
 		const { error: err } = await locals.supabase.from('comments').delete().eq('id', comment_id);
 		if (err) return fail(500, { error: err.message });
-		return { success: true };
+		redirect(303, `/channels/${params.slug}`);
 	}
 };
