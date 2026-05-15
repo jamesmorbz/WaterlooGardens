@@ -36,7 +36,7 @@ export const load: PageServerLoad = async ({ locals, parent, url }) => {
 	const [{ data: pending }, { data: allUsers }, { data: allDocs }] = await Promise.all([
 		locals.supabase.from('profiles').select('*').eq('status', 'pending').order('created_at'),
 		locals.supabase.from('profiles').select('*').order('full_name'),
-		locals.supabase.from('documents').select('id, filename, category, tags, created_at, storage_path').order('created_at', { ascending: false })
+		locals.supabase.from('documents').select('id, filename, category, tags, audience, created_at, storage_path').order('created_at', { ascending: false })
 	]);
 
 	return { pending: pending ?? [], allUsers: allUsers ?? [], allDocs: allDocs ?? [], tab, currentUserId: user?.id ?? null };

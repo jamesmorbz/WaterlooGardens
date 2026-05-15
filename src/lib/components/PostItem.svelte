@@ -34,7 +34,7 @@
 			<form method="POST" action="?/pinPost">
 				<input type="hidden" name="post_id" value={post.id} />
 				<input type="hidden" name="pinned" value={String(post.is_pinned)} />
-				<button type="submit" class="btn-link" style="font-size:0.78rem">
+				<button type="submit" class="btn-link text-[0.78rem]">
 					{post.is_pinned ? 'Unpin' : 'Pin'}
 				</button>
 			</form>

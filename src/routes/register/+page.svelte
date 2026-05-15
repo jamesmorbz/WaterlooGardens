@@ -33,7 +33,7 @@
 			/>
 		</div>
 		<div class="form-group">
-			<p style="font-size:0.875rem;font-weight:500;margin:0 0 0.375rem">I am a</p>
+			<p class="text-sm font-medium mb-1.5">I am a</p>
 			<div class="radio-group">
 				<label class="radio-label">
 					<input type="radio" name="user_type" value="leaseholder" required
@@ -60,7 +60,7 @@
 					name="user_type_custom"
 					placeholder="Please specify…"
 					required
-					style="margin-top:0.5rem;width:100%"
+					class="mt-2"
 				/>
 			{/if}
 		</div>
@@ -71,11 +71,11 @@
 		<div class="form-group">
 			<label for="password">
 				Password
-				<span style="font-weight:400;color:var(--color-muted)">(min 8 characters)</span>
+				<span class="font-normal text-muted">(min 8 characters)</span>
 			</label>
 			<input id="password" type="password" name="password" required minlength="8" autocomplete="new-password" />
 		</div>
-		<button type="submit" class="btn-primary" style="width:100%">Register</button>
+		<button type="submit" class="btn-primary w-full">Register</button>
 		<p class="register-disclaimer">
 			By registering you may receive email notifications when announcements are posted to the portal.
 		</p>

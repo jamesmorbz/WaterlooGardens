@@ -15,11 +15,13 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		error(403, 'Access denied');
 	}
 
-	const { filename, description, category, tags, storagePath } = await request.json();
+	const { filename, description, category, tags, storagePath, audience } = await request.json();
 
 	if (!filename || !category || !storagePath) {
 		error(400, 'Missing required fields');
 	}
+
+	const audienceValue = audience === 'leaseholders' ? 'leaseholders' : 'all';
 
 	const { error: insertErr } = await locals.supabase.from('documents').insert({
 		filename,
@@ -28,7 +30,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		storage_path: storagePath,
 		mime_type: 'application/pdf',
 		uploaded_by: user.id,
-		tags: tags ?? []
+		tags: tags ?? [],
+		audience: audienceValue
 	});
 
 	if (insertErr) {

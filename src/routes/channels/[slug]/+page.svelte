@@ -74,7 +74,7 @@
 		<div class="chat-shell">
 			<div class="chat-scroll" id="chat-scroll">
 				{#if data.posts.length === 0}
-					<p style="color:var(--color-muted);font-size:0.9rem;text-align:center;padding:2rem">
+					<p class="text-muted text-[0.9rem] text-center p-8">
 						No messages yet — be the first to say something!
 					</p>
 				{:else}
@@ -86,8 +86,8 @@
 
 			{#if canPost}
 				<div class="chat-compose-bar">
-					{#if form?.error}<p style="color:var(--color-danger);font-size:0.8rem;margin-bottom:0.375rem">{form.error}</p>{/if}
-					<form method="POST" action="?/createPost" style="display:flex;gap:0.625rem;flex:1;align-items:flex-end">
+					{#if form?.error}<p class="text-danger text-[0.8rem] mb-1.5">{form.error}</p>{/if}
+					<form method="POST" action="?/createPost" class="flex gap-2.5 flex-1 items-end">
 						<textarea
 							class="chat-input"
 							name="body"
@@ -114,7 +114,7 @@
 			<div>
 				<h1>{data.channel.name}</h1>
 				{#if data.channel.description}
-					<p style="color:var(--color-muted);font-size:0.875rem">{data.channel.description}</p>
+					<p class="text-muted text-sm">{data.channel.description}</p>
 				{/if}
 			</div>
 		</div>

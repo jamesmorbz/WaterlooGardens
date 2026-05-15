@@ -58,9 +58,17 @@
 			behalf of all residents. They are responsible for appointing contractors, setting the
 			service charge budget, and keeping residents informed.
 		</p>
+		<h2>Reporting issues</h2>
 		<p>
-			If you have a general question or concern, you can post in the <a href="/channels/general">Residents' Forum</a>.
-			<strong>For urgent matters, please contact <a href="/faq#current-directors" class="highlight-link">the directors</a> directly using the details on the FAQ page.</strong>
-</p>
+			For day-to-day building issues — repairs, cleaning, communal areas, deliveries, and anything
+			operational — please contact <strong>LBM</strong> (our managing agent) or speak to the
+			<strong>porter</strong> in the first instance. They are best placed to deal with these quickly.
+		</p>
+		<p>
+			The <a href="/channels/general">Residents' Forum</a> is a good place for questions or
+			discussions amongst neighbours. The directors should generally not be contacted directly for
+			routine matters — raising issues through LBM or the porter ensures they are logged and
+			dealt with properly.
+		</p>
 	</div>
 </div>

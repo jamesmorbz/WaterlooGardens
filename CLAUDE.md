@@ -11,7 +11,7 @@ Waterloo Gardens Resident Portal — a lightweight web app for a single apartmen
 ## Stack
 
 - **Frontend**: SvelteKit (file-based routing, `+page.server.ts` load functions for all DB queries)
-- **Styling**: Plain CSS only — no frameworks. Custom properties in `:root {}`, `rem` units, `clamp()` for fluid type, media queries for responsive layout
+- **Styling**: Tailwind CSS v4 (via `@tailwindcss/vite` plugin). Design tokens defined in `@theme {}` in `src/app.css`. Component classes use `@apply` in `@layer components`. Inline Tailwind utilities for layout and one-off styles in Svelte files.
 - **Backend**: Supabase (PostgreSQL + Auth + Storage)
 - **Hosting**: Vercel with SvelteKit adapter (eu-west-2 / London region for GDPR)
 - **Email**: Supabase Auth emails for auth flows; Resend (`RESEND_API_KEY`) for approval notifications
@@ -19,7 +19,7 @@ Waterloo Gardens Resident Portal — a lightweight web app for a single apartmen
 ## Development Commands
 
 ```bash
-npm run dev          # start dev server
+npm run dev          # start dev server (Tailwind compiled by @tailwindcss/vite)
 npm run build        # production build
 npm run check        # TypeScript + Svelte type check (must pass with 0 errors, 0 warnings)
 npx supabase db push # apply migrations (requires SUPABASE_ACCESS_TOKEN in .env)
@@ -30,6 +30,14 @@ npx supabase db push # apply migrations (requires SUPABASE_ACCESS_TOKEN in .env)
 Required to run CLI commands (`db push`, etc.). Get one from **supabase.com/dashboard/account/tokens** → Generate new token. Store as `SUPABASE_ACCESS_TOKEN` in `.env`. The CLI reads it automatically.
 
 Database schema changes go in `/supabase/migrations/` as numbered SQL files — never ad-hoc in the dashboard.
+
+## CSS / Tailwind Conventions
+
+- **Design tokens** live in `@theme {}` in `src/app.css`. Custom colors: `primary`, `primary-dark`, `accent`, `bg`, `surface`, `border`, `ink`, `muted`, `danger`, `danger-dark`. Use as `bg-primary`, `text-muted`, `border-border`, etc.
+- **Component classes** (`.btn-primary`, `.nav-link`, `.chat-bubble`, `.prose`, etc.) are defined with `@apply` in `@layer components` inside `app.css`. Keep component CSS here, not in `<style>` blocks.
+- **Inline utilities** for layout, spacing, and one-off styles directly in Svelte templates.
+- **No custom CSS vars in templates** — use Tailwind utilities (`text-muted` not `color:var(--color-muted)`). Exception: dynamic inline styles (e.g. avatar background color computed at runtime).
+- **Responsive**: breakpoints at `700px` (hide desktop nav → show hamburger) and `600px` (single-column profile, hide PDF preview button). Handled in the `@media` blocks at the bottom of `@layer components`.
 
 ## Architecture Rules
 

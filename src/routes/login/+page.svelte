@@ -38,7 +38,7 @@
 				<label for="password">Password</label>
 				<input id="password" type="password" name="password" required autocomplete="current-password" />
 			</div>
-			<button type="submit" class="btn-primary" style="width:100%">Sign in</button>
+			<button type="submit" class="btn-primary w-full">Sign in</button>
 		</form>
 		<div class="auth-links">
 			<a href="/register">Create account</a>
@@ -50,7 +50,7 @@
 				<label for="reset-email">Your email address</label>
 				<input id="reset-email" type="email" name="email" required autocomplete="email" />
 			</div>
-			<button type="submit" class="btn-primary" style="width:100%">Send reset link</button>
+			<button type="submit" class="btn-primary w-full">Send reset link</button>
 		</form>
 		<div class="auth-links">
 			<button class="btn-link" onclick={() => (showForgot = false)}>Back to sign in</button>

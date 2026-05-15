@@ -47,5 +47,6 @@ export interface Document {
 	uploaded_by: string | null;
 	created_at: string;
 	tags: string[];
+	audience: 'all' | 'leaseholders';
 	signed_url?: string | null;
 }

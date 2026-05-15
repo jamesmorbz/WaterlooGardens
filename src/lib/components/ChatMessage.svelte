@@ -61,7 +61,7 @@
 			</div>
 		{/if}
 
-		<div style="display:flex;align-items:flex-end;gap:0.5rem;flex-wrap:wrap">
+		<div class="flex items-end gap-2 flex-wrap">
 			<div class="chat-bubble">{post.body}</div>
 			{#if grouped}
 				<time class="chat-grouped-time">{smartTime(post.created_at)}</time>
@@ -79,14 +79,14 @@
 							{initial(comment.author?.full_name ?? 'U')}
 						</div>
 						<div class="thread-content">
-							<div style="display:flex;align-items:baseline;gap:0.375rem;flex-wrap:wrap">
+							<div class="flex items-baseline gap-1.5 flex-wrap">
 								<span class="thread-author">{comment.author?.full_name ?? 'Unknown'}</span>
 								<span class="thread-flat">Flat {comment.author?.flat_number ?? '?'}</span>
 								<time class="thread-time">{smartTime(comment.created_at)}</time>
 								{#if isDirector}
-									<form method="POST" action="?/deleteComment" style="margin:0;margin-left:auto">
+									<form method="POST" action="?/deleteComment" class="ml-auto">
 										<input type="hidden" name="comment_id" value={comment.id} />
-										<button type="submit" class="btn-link" style="color:var(--color-danger);font-size:0.72rem">Delete</button>
+										<button type="submit" class="btn-link text-danger text-[0.72rem]">Delete</button>
 									</form>
 								{/if}
 							</div>
@@ -104,9 +104,9 @@
 				</button>
 			{/if}
 			{#if isDirector}
-				<form method="POST" action="?/deletePost" style="margin:0">
+				<form method="POST" action="?/deletePost">
 					<input type="hidden" name="post_id" value={post.id} />
-					<button type="submit" class="btn-link" style="color:var(--color-danger)">Delete</button>
+					<button type="submit" class="btn-link text-danger">Delete</button>
 				</form>
 			{/if}
 		</div>

@@ -114,8 +114,7 @@
 				{/each}
 				{#if activeTags.size > 0}
 					<button
-						class="tag-filter-pill"
-						style="opacity:0.65"
+						class="tag-filter-pill opacity-65"
 						type="button"
 						onclick={() => (activeTags = new Set())}
 					>✕ Clear</button>

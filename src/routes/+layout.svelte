@@ -43,7 +43,7 @@
 	<div class="nav-auth">
 		{#if data.session}
 			<a href="/profile" class="nav-user">{data.profile?.full_name ?? 'Account'}</a>
-			<form method="POST" action="/logout" style="margin:0">
+			<form method="POST" action="/logout">
 				<button type="submit" class="btn-nav-signout">Sign out</button>
 			</form>
 		{:else}

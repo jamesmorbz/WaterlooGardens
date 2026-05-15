@@ -7,7 +7,7 @@
 <svelte:head><title>Profile – Waterloo Gardens</title></svelte:head>
 
 <div class="page profile-page">
-	<h1 style="margin-bottom:1.25rem">Profile</h1>
+	<h1 class="mb-5">Profile</h1>
 
 	<div class="profile-grid">
 
@@ -62,9 +62,9 @@
 			{#if data.profile}
 				<div class="profile-section">
 					<h2>Account</h2>
-					<div style="display:flex;flex-direction:column;gap:0.5rem;margin-top:0.25rem">
-						<span style="font-size:0.875rem;color:var(--color-muted)">Flat {data.profile.flat_number}</span>
-						<div style="display:flex;gap:0.5rem;flex-wrap:wrap">
+					<div class="flex flex-col gap-2 mt-1">
+						<span class="text-sm text-muted">Flat {data.profile.flat_number}</span>
+						<div class="flex gap-2 flex-wrap">
 							<span class="user-type-badge" class:tenant={data.profile.user_type === 'tenant'}>{data.profile.user_type}</span>
 							{#if data.profile.role === 'director'}
 								<span class="user-type-badge" style="background:#ede9fe;color:#5b21b6">director</span>
@@ -76,7 +76,7 @@
 
 			<div class="profile-section danger-zone">
 				<h2>Delete account</h2>
-				<p style="font-size:0.8rem;color:var(--color-muted);margin-bottom:0.875rem;line-height:1.5">
+				<p class="text-[0.8rem] text-muted mb-3.5 leading-relaxed">
 					Permanently deletes your account and signs you out. Posts and comments remain anonymised.
 				</p>
 				{#if form?.deleteError}<p class="error-msg">{form.deleteError}</p>{/if}

@@ -16,6 +16,7 @@
 	let uploadDesc = $state('');
 	let uploadCategory = $state('');
 	let uploadTags = $state('');
+	let uploadAudience = $state<'all' | 'leaseholders'>('all');
 	let uploadStatus = $state<'idle' | 'uploading' | 'saving' | 'done' | 'error'>('idle');
 	let uploadError = $state('');
 
@@ -66,7 +67,6 @@
 		uploadError = '';
 
 		try {
-			// Step 1: get a signed upload URL from our server
 			const urlRes = await fetch('/api/upload-url', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
@@ -78,7 +78,6 @@
 			}
 			const { signedUrl, storagePath } = await urlRes.json();
 
-			// Step 2: upload directly to Supabase Storage — bypasses Vercel entirely
 			const putRes = await fetch(signedUrl, {
 				method: 'PUT',
 				body: uploadFileObj,
@@ -86,7 +85,6 @@
 			});
 			if (!putRes.ok) throw new Error('File upload failed. Please try again.');
 
-			// Step 3: save metadata row
 			uploadStatus = 'saving';
 			const tags = uploadTags.split(',').map((t) => t.trim()).filter(Boolean);
 			const saveRes = await fetch('/api/save-document', {
@@ -97,7 +95,8 @@
 					description: uploadDesc.trim() || null,
 					category: uploadCategory.trim(),
 					tags,
-					storagePath
+					storagePath,
+					audience: uploadAudience
 				})
 			});
 			if (!saveRes.ok) {
@@ -105,13 +104,13 @@
 				throw new Error(body.message ?? 'Failed to save document record.');
 			}
 
-			// Reset form
 			uploadFileObj = null;
 			selectedFile = '';
 			uploadFilename = '';
 			uploadDesc = '';
 			uploadCategory = '';
 			uploadTags = '';
+			uploadAudience = 'all';
 			uploadStatus = 'done';
 		} catch (err) {
 			uploadStatus = 'error';
@@ -123,7 +122,7 @@
 <svelte:head><title>Director Panel – Waterloo Gardens</title></svelte:head>
 
 <div class="page">
-	<h1 style="margin-bottom:1.5rem">Director Panel</h1>
+	<h1 class="mb-6">Director Panel</h1>
 
 	<div class="panel-tabs">
 		<button class="panel-tab" class:active={tab === 'pending'} onclick={() => setTab('pending')}>
@@ -170,7 +169,7 @@
 										<input type="hidden" name="user_id" value={user.id} />
 										<button type="submit" class="btn-primary">Approve</button>
 									</form>
-									<form method="POST" action="?/reject" style="display:flex;gap:0.375rem;align-items:center">
+									<form method="POST" action="?/reject" class="flex gap-1.5 items-center">
 										<input type="hidden" name="user_id" value={user.id} />
 										<input class="reject-note" type="text" name="note" placeholder="Reason (optional)" />
 										<button type="submit" class="btn-danger">Reject</button>
@@ -185,12 +184,12 @@
 
 	{:else if tab === 'announce'}
 		{#if page.url.searchParams.get('posted')}
-			<p class="info-msg" style="background:#d1fae5;color:#065f46">Announcement posted successfully.</p>
+			<p class="info-msg bg-emerald-100! text-emerald-800!">Announcement posted successfully.</p>
 		{/if}
 		{#if form?.error}<p class="error-msg">{form.error}</p>{/if}
-		<form method="POST" action="?/postAnnouncement" style="max-width:560px">
+		<form method="POST" action="?/postAnnouncement" class="max-w-[560px]">
 			<div class="form-group">
-				<label for="ann-title">Title <span style="font-weight:400;color:var(--color-muted)">(optional)</span></label>
+				<label for="ann-title">Title <span class="font-normal text-muted">(optional)</span></label>
 				<input id="ann-title" type="text" name="title" placeholder="e.g. AGM Notice – June 2026" />
 			</div>
 			<div class="form-group">
@@ -214,14 +213,14 @@
 
 	{:else if tab === 'upload'}
 		{#if uploadStatus === 'done'}
-			<p class="info-msg" style="background:#d1fae5;color:#065f46">Document uploaded successfully.</p>
+			<p class="info-msg bg-emerald-100! text-emerald-800!">Document uploaded successfully.</p>
 		{/if}
 		{#if uploadStatus === 'error'}
 			<p class="error-msg">{uploadError}</p>
 		{/if}
-		<form onsubmit={handleUploadSubmit} style="max-width:560px">
+		<form onsubmit={handleUploadSubmit} class="max-w-[560px]">
 			<div class="form-group">
-				<p style="font-size:0.875rem;font-weight:500;margin:0 0 0.375rem">PDF file</p>
+				<p class="text-sm font-medium mb-1.5">PDF file</p>
 				<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 				<!-- svelte-ignore a11y_click_events_have_key_events -->
 				<label class="upload-zone" class:has-file={selectedFile} for="file-input">
@@ -252,7 +251,7 @@
 				/>
 			</div>
 			<div class="form-group">
-				<label for="doc-desc">Description <span style="font-weight:400;color:var(--color-muted)">(optional)</span></label>
+				<label for="doc-desc">Description <span class="font-normal text-muted">(optional)</span></label>
 				<textarea id="doc-desc" rows="2" placeholder="Brief description of the document" bind:value={uploadDesc}></textarea>
 			</div>
 			<div class="form-group">
@@ -276,13 +275,32 @@
 				</datalist>
 			</div>
 			<div class="form-group">
-				<label for="doc-tags">Tags <span style="font-weight:400;color:var(--color-muted)">(comma-separated)</span></label>
+				<label for="doc-tags">Tags <span class="font-normal text-muted">(comma-separated)</span></label>
 				<input
 					id="doc-tags"
 					type="text"
 					placeholder="e.g. 2025, service charge, accounts"
 					bind:value={uploadTags}
 				/>
+			</div>
+			<div class="form-group">
+				<p class="text-sm font-medium mb-1.5">Audience</p>
+				<div class="radio-group">
+					<label class="radio-label">
+						<input type="radio" name="audience" value="all" bind:group={uploadAudience} />
+						<span>
+							Leaseholders &amp; tenants
+							<small>Visible to all approved residents</small>
+						</span>
+					</label>
+					<label class="radio-label">
+						<input type="radio" name="audience" value="leaseholders" bind:group={uploadAudience} />
+						<span>
+							Leaseholders only
+							<small>Hidden from tenants and sub-lessees</small>
+						</span>
+					</label>
+				</div>
 			</div>
 			<button type="submit" class="btn-primary" disabled={uploadStatus === 'uploading' || uploadStatus === 'saving'}>
 				{#if uploadStatus === 'uploading'}Uploading…{:else if uploadStatus === 'saving'}Saving…{:else}Upload Document{/if}
@@ -291,7 +309,7 @@
 
 	{:else if tab === 'docs'}
 		{#if form?.error}<p class="error-msg">{form.error}</p>{/if}
-		<div class="search-field" style="max-width:360px;margin-bottom:1.25rem">
+		<div class="search-field max-w-[360px] mb-5">
 			<input type="search" placeholder="Search by name or category…" bind:value={docSearch} />
 		</div>
 		{#if data.allDocs.length === 0}
@@ -302,13 +320,20 @@
 			<div class="table-scroll">
 				<table class="director-table">
 					<thead>
-						<tr><th>Name</th><th>Category</th><th>Uploaded</th><th></th></tr>
+						<tr><th>Name</th><th>Category</th><th>Audience</th><th>Uploaded</th><th></th></tr>
 					</thead>
 					<tbody>
 						{#each filteredDocs as doc (doc.id)}
 							<tr>
 								<td>{doc.filename}</td>
 								<td><span class="category-badge">{doc.category}</span></td>
+								<td>
+									{#if doc.audience === 'leaseholders'}
+										<span class="user-type-badge">Leaseholders</span>
+									{:else}
+										<span class="text-muted text-xs">All</span>
+									{/if}
+								</td>
 								<td>{new Date(doc.created_at).toLocaleDateString('en-GB')}</td>
 								<td>
 									<form method="POST" action="?/deleteDocument">
@@ -328,7 +353,7 @@
 		{/if}
 
 	{:else if tab === 'residents'}
-		<div class="search-field" style="max-width:360px;margin-bottom:1.25rem">
+		<div class="search-field max-w-[360px] mb-5">
 			<input type="search" placeholder="Search by name, flat or type…" bind:value={residentSearch} />
 		</div>
 		{#if filteredResidents.length === 0}

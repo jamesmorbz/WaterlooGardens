@@ -25,10 +25,28 @@
 			Library you need to <a href="/register">register</a> and be approved.
 		</p>
 
+		<h2>I have a building issue — who do I contact?</h2>
+		<p>
+			For repairs, cleaning, communal areas, and any other day-to-day operational matters, please
+			contact <strong>LBM</strong> (our managing agent) or speak to the <strong>porter</strong>
+			directly. Issues raised through them are properly logged and acted on more quickly than
+			going to directors.
+		</p>
+		<ul>
+			<li><strong>Jing Li</strong> (LBM) – <a class="director-email" href="mailto:JLi@blockmanagement.com">JLi@blockmanagement.com</a></li>
+			<li><strong>Asmaa Sharif</strong> (LBM) – <a class="director-email" href="mailto:asharif@blockmanagement.com">asharif@blockmanagement.com</a></li>
+			<li><strong>Jacek</strong> (Porter) – <a class="director-email" href="mailto:porter.waterloogardens@yahoo.com">porter.waterloogardens@yahoo.com</a></li>
+		</ul>
+		<p>
+			The <a href="/channels/general">Residents' Forum</a> is a good place to discuss things with
+			neighbours, but it is not a substitute for raising formal issues with LBM or the porter.
+		</p>
+
 		<h2>How do I contact the directors?</h2>
 		<p>
-			For general questions, you can post in the <a href="/channels/general">Residents' Forum</a>.
-			<strong>For urgent matters, please contact <a href="#current-directors" class="highlight-link">the directors</a> directly using the details below.</strong>
+			The directors manage the RTM company and focus on strategic matters — budgets, major works,
+			legal obligations, and the service charge. For routine building issues please contact LBM
+			or the porter first. If you do need to reach a director, their details are <a href="#current-directors" class="highlight-link">below</a>.
 		</p>
 		<h2>I'm having trouble with my account</h2>
 		<p>
@@ -46,12 +64,12 @@
 		<h2>About this portal</h2>
 		<p>
 			The Waterloo Gardens resident portal was designed and built by a resident of the building,
-			with the assistance of <a href="https://claude.ai" target="_blank" rel="noopener">Claude</a>,
-			an AI assistant made by <a href="https://anthropic.com" target="_blank" rel="noopener">Anthropic</a>.
+			with the assistance of <a href="https://claude.ai" target="_blank" rel="noopener">Claude</a>.
 			It is a purpose-built tool for this building — not a commercial product.
 		</p>
 		<p>
-			If you spot a bug or have a suggestion, please post in the forum or raise it with <a href="#current-directors" class="highlight-link">the directors</a>.
+			If you spot a bug or have a suggestion for the portal, please post in the
+			<a href="/channels/general">Residents' Forum</a>.
 		</p>
 </div>
 </div>
